@@ -4,7 +4,7 @@ import streamlit as st
 
 # 페이지 설정
 st.set_page_config(
-    page_title="2026 YUnicorn 루키톤 - 스피드 TMI 서바이벌",
+    page_title="2026 YUnicorn 루키톤 - 스피드 서바이벌",
     page_icon="💥",
     layout="centered"
 )
