@@ -9,7 +9,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# 커스텀 CSS (Expander 가독성 개선 및 귀여운 스타일링)
+# 커스텀 CSS (Expander 및 버튼 가독성 완전 개선)
 st.markdown("""
     <style>
     /* 전체 배경 */
@@ -36,7 +36,7 @@ st.markdown("""
     
     div[data-testid="stExpander"] summary {
         background-color: #2b2b36 !important;
-        color: #FFD166 !important; /* 명확한 노란색 글자 */
+        color: #FFD166 !important; /* 선명한 노란색 글자 */
         font-weight: bold !important;
         font-size: 1.15rem !important;
         border-radius: 12px !important;
@@ -44,8 +44,45 @@ st.markdown("""
     }
     
     div[data-testid="stExpander"] summary:hover {
-        background-color: #383848 !important; /* 마우스 올렸을 때 어두운 가독성 높은 배경 */
+        background-color: #383848 !important;
         color: #FFFFFF !important;
+    }
+
+    /* 버튼 가독성 고정 (글자색 & 배경색 강제 지정) */
+    div.stButton > button {
+        background-color: #06D6A0 !important; /* 선명한 그린 배경 */
+        color: #121212 !important; /* 검은색 글씨로 가독성 확보 */
+        font-weight: bold !important;
+        border-radius: 12px !important;
+        border: none !important;
+        padding: 10px 20px !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    div.stButton > button:hover {
+        background-color: #05b88a !important;
+        color: #ffffff !important; /* 마우스 올렸을 때 흰글씨 */
+        box-shadow: 0 4px 12px rgba(6, 214, 160, 0.4) !important;
+    }
+
+    /* 삭제 및 보조 버튼 전용 스타일 */
+    div.stButton > button[kind="secondary"] {
+        background-color: #FF5964 !important; /* 핑크/레드 배경 */
+        color: #ffffff !important;
+    }
+    div.stButton > button[kind="secondary"]:hover {
+        background-color: #d9414c !important;
+        box-shadow: 0 4px 12px rgba(255, 89, 100, 0.4) !important;
+    }
+
+    /* 입력창(Text Input) 스타일 */
+    div[data-baseweb="input"] {
+        background-color: #2a2a2a !important;
+        border-radius: 10px !important;
+        border: 1px solid #444 !important;
+    }
+    div[data-baseweb="input"] input {
+        color: #ffffff !important;
     }
     
     /* 카드 스타일 */
