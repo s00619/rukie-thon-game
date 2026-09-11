@@ -10,7 +10,7 @@ st.set_page_config(
 )
 
 # ----------------------------------------------------
-# [실시간 공유 데이터베이스] 모든 접속자가 상태를 공유함
+# [실시간 공유 데이터베이스]
 # ----------------------------------------------------
 @st.cache_resource
 def get_shared_game_state():
@@ -20,20 +20,18 @@ def get_shared_game_state():
         "current_keyword": "",
         "is_active": False,
         "is_exploded": False,
-        "time_limit": 5,
-        "game_version": 0 # 화면 새로고침용 카운터
+        "last_update": time.time()  # 상태 변경 감지용 타임스탬프
     }
 
 game_state = get_shared_game_state()
 
-# 기본 키워드 목록
 KEYWORDS = [
     "문경 최고의 맛집", "내가 제일 잘하는 기술", "학교 매점 최애 메뉴",
     "요즘 가장 즐겨하는 게임", "나만의 스트레스 해소법", "가지고 싶은 신기술 제품",
     "이번 루키톤에서 내 역할", "멘토님께 궁금한 점", "주말에 주로 하는 것"
 ]
 
-# Style
+# CSS 스타일링
 st.markdown("""
     <style>
     .stApp { background-color: #121212; color: white; }
@@ -43,30 +41,30 @@ st.markdown("""
     div[data-testid="stExpander"] { background-color: #1e1e1e !important; border: 2px solid #333 !important; border-radius: 15px !important; }
     div[data-testid="stExpander"] summary { background-color: #2b2b36 !important; color: #FFD166 !important; font-weight: bold !important; font-size: 1.15rem !important; }
     
-    /* Buttons */
-    div.stButton > button { background-color: #06D6A0 !important; color: #121212 !important; font-weight: bold !important; border-radius: 12px !important; border: none !important; padding: 12px 20px !important; }
-    div.stButton > button[kind="secondary"] { background-color: #FF5964 !important; color: #ffffff !important; }
+    /* 큰 시작 버튼 전용 스타일 */
+    .start-btn button {
+        background-color: #06D6A0 !important;
+        color: #121212 !important;
+        font-size: 1.5rem !important;
+        font-weight: bold !important;
+        padding: 18px !important;
+        border-radius: 15px !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(6, 214, 160, 0.4) !important;
+    }
     
-    /* Cards */
+    /* 카드 스타일 */
     .keyword-card { background-color: #1e1e1e; border-radius: 15px; padding: 20px; text-align: center; font-size: 1.8rem; font-weight: bold; color: #06D6A0; border: 2px solid #333; margin-bottom: 20px; }
     .name-card { background-color: #2b2b36; border-radius: 20px; padding: 30px; text-align: center; font-size: 3.5rem; font-weight: bold; color: #FFD166; margin: 20px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     .exploded-card { background-color: #381a1d; border-radius: 20px; padding: 30px; text-align: center; font-size: 3.5rem; font-weight: bold; color: #FF5964; border: 3px solid #FF5964; }
-    .host-badge { background-color: #FFD166; color: #121212; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
     </style>
 """, unsafe_allow_html=True)
 
 st.markdown("<div class='main-title'>🚀 2026 YUnicorn 루키톤<br>스피드 키워드 서바이벌</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# [1] 방장 설정 & 이름 입력 영역
+# [1] 참가자 이름 입력 및 관리 영역
 # ----------------------------------------------------
-col_host, col_refresh = st.columns([3, 1])
-with col_host:
-    is_host = st.checkbox("👑 내가 방장(게임 진행자)입니다", value=False)
-with col_refresh:
-    if st.button("🔄 화면 갱신"):
-        st.rerun()
-
 with st.expander("🙋‍♂️ 참가자 이름 입력 / 명단 확인", expanded=True):
     col1, col2 = st.columns([3, 1])
     with col1:
@@ -75,51 +73,51 @@ with st.expander("🙋‍♂️ 참가자 이름 입력 / 명단 확인", expand
         if st.button("✨ 등록", use_container_width=True):
             if new_name and new_name not in game_state["students"]:
                 game_state["students"].append(new_name)
-                st.success(f"'{new_name}' 등록 완료!")
+                game_state["last_update"] = time.time()
                 st.rerun()
     
-    # 실시간 명단 표시
     if game_state["students"]:
         st.write(f"**현재 접속 참가자 ({len(game_state['students'])}명):**")
         tags = " ".join([f"`👤 {name}`" for name in game_state["students"]])
         st.markdown(tags)
         
-        if is_host and st.button("🧹 전체 명단 초기화", type="secondary"):
+        if st.button("🧹 전체 명단 초기화", type="secondary"):
             game_state["students"] = []
             game_state["is_active"] = False
+            game_state["last_update"] = time.time()
             st.rerun()
     else:
-        st.info("학생들은 이곳에 이름을 입력하고 등록 버튼을 눌러주세요!")
+        st.info("학생들은 이름을 입력하고 '✨ 등록' 버튼을 눌러주세요!")
 
 st.divider()
 
 # ----------------------------------------------------
-# [2] 게임 메인 제어 및 화면 표시
+# [2] 메인 게임 시작 및 진행 버튼 (방장/진행자용)
 # ----------------------------------------------------
+st.markdown("<div class='start-btn'>", unsafe_allow_html=True)
+if not game_state["students"]:
+    st.warning("⚠️ 참가자를 1명 이상 등록하면 시작 버튼이 활성화됩니다.")
+else:
+    if st.button("🔥 게임 시작 / 다음 폭탄 전달 (START / NEXT)", use_container_width=True):
+        game_state["current_student"] = random.choice(game_state["students"])
+        game_state["current_keyword"] = random.choice(KEYWORDS)
+        game_state["is_active"] = True
+        game_state["is_exploded"] = False
+        game_state["last_update"] = time.time()  # 상태 업데이트
+        st.rerun()
+st.markdown("</div>", unsafe_allow_html=True)
 
-# 방장 전용 진행 컨트롤
-if is_host:
-    st.markdown("<span class='host-badge'>👑 방장 전용 컨트롤러</span>", unsafe_allow_html=True)
-    if not game_state["students"]:
-        st.warning("학생들이 먼저 이름을 등록해야 게임을 시작할 수 있습니다.")
-    else:
-        if st.button("🔥 폭탄 돌리기 / 다음 사람 지목 (START)", use_container_width=True):
-            game_state["current_student"] = random.choice(game_state["students"])
-            game_state["current_keyword"] = random.choice(KEYWORDS)
-            game_state["is_active"] = True
-            game_state["is_exploded"] = False
-            game_state["game_version"] += 1
-            st.rerun()
-
-# 전체 화면 (학생 및 방장 공통 표시)
+# ----------------------------------------------------
+# [3] 게임 플레이 연출 및 실시간 자동 동기화
+# ----------------------------------------------------
 if game_state["is_active"]:
     st.markdown(f"<div class='keyword-card'>📌 주제: {game_state['current_keyword']}</div>", unsafe_allow_html=True)
     
     name_placeholder = st.empty()
     name_placeholder.markdown(f"<div class='name-card'>👤 {game_state['current_student']}</div>", unsafe_allow_html=True)
     
-    # 타이머 연출 (방장 화면 기준 타이머 실행)
-    if is_host and not game_state["is_exploded"]:
+    # 타이머 연출
+    if not game_state["is_exploded"]:
         progress_bar = st.progress(100)
         start_time = time.time()
         time_limit = 5.0
@@ -133,11 +131,17 @@ if game_state["is_active"]:
             
             if remaining <= 0:
                 game_state["is_exploded"] = True
+                game_state["last_update"] = time.time()
                 st.rerun()
                 break
             time.sleep(0.05)
             
     if game_state["is_exploded"]:
         name_placeholder.markdown(f"<div class='exploded-card'>💥 {game_state['current_student']} 당첨! 💥</div>", unsafe_allow_html=True)
-else:
-    st.info("방장(선생님)이 게임 시작 버튼을 누르면 화면에 주제와 당첨자가 나타납니다!")
+
+# ----------------------------------------------------
+# [4] 대기 상태일 때 자동 감지 리프레시 (2초 폴링)
+# ----------------------------------------------------
+if not game_state["is_active"]:
+    time.sleep(2)
+    st.rerun()
