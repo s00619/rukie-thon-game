@@ -333,7 +333,7 @@ st.markdown("""
 
 st.markdown("<div class='main-title'>🚀 2026 YUnicorn 루키톤<br>스피드 TMI 서바이벌</div>", unsafe_allow_html=True)
 
-# 세션별 로컬 타임스탬프 추적 변수
+# 세션별 로컬 타임스탬프 동기화 트래커
 if "last_seen_update" not in st.session_state:
     st.session_state["last_seen_update"] = 0
 
@@ -375,6 +375,7 @@ with st.expander("🙋‍♂️ 내 이름 등록 / 접속자 확인", expanded=
         if (is_host or st.session_state["my_name"] == "방장") and st.button("🧹 명단 초기화", type="secondary"):
             game_state["students"] = []
             game_state["is_active"] = False
+            game_state["is_exploded"] = False
             game_state["used_keywords"] = []
             game_state["last_update"] = time.time()
             st.rerun()
@@ -391,21 +392,24 @@ def get_random_keyword():
     return selected
 
 # ----------------------------------------------------
-# [2] 게임 진행 및 버튼 제어
+# [2] 게임 진행 및 재시작 제어 (강제 동기화 적용)
 # ----------------------------------------------------
 if not game_state["students"]:
     st.warning("⚠️ 학생 참가자를 1명 이상 등록해 주세요.")
 else:
-    # 1) 게임 시작 전/종료 상태
+    # 1) 게임 시작 전 또는 폭발/탈락 후 재시작 대기 상태
     if not game_state["is_active"] or game_state["is_exploded"]:
         st.markdown("<div class='start-btn'>", unsafe_allow_html=True)
-        if st.button("🚀 게임 시작 (폭탄 돌리기)", use_container_width=True):
+        btn_text = "🚀 게임 시작 (폭탄 돌리기)" if not game_state["is_exploded"] else "🔥 다음 라운드 게임 재시작!"
+        
+        if st.button(btn_text, use_container_width=True):
             game_state["current_student"] = random.choice(game_state["students"])
             game_state["current_keyword"] = get_random_keyword()
             game_state["is_active"] = True
             game_state["is_exploded"] = False
             game_state["start_time"] = time.time()
-            game_state["last_update"] = time.time()
+            game_state["last_update"] = time.time() # 전역 타임스탬프 갱신
+            st.session_state["last_seen_update"] = game_state["last_update"]
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -425,7 +429,8 @@ else:
                 game_state["current_student"] = random.choice(candidates)
                 game_state["current_keyword"] = get_random_keyword()
                 game_state["start_time"] = time.time() # 7초 리셋
-                game_state["last_update"] = time.time()
+                game_state["last_update"] = time.time() # 전역 타임스탬프 갱신
+                st.session_state["last_seen_update"] = game_state["last_update"]
                 st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
             
@@ -433,8 +438,14 @@ else:
             st.markdown(f"<div class='wait-box'>⏳ [{current_target}] 님이 답변 중...</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# [3] 메인 연출, 타이머 및 초고속 실시간 일괄 동기화
+# [3] 초고속 전역 상태 하트비트 감지 (0.3초 동기화)
 # ----------------------------------------------------
+
+# 모든 기기가 전역 서버 상태 변경(`last_update`)을 실시간 감지하여 자동 리프레시
+if st.session_state["last_seen_update"] != game_state["last_update"]:
+    st.session_state["last_seen_update"] = game_state["last_update"]
+    st.rerun()
+
 if game_state["is_active"]:
     st.markdown(f"<div class='keyword-card'>📌 {game_state['current_keyword']}</div>", unsafe_allow_html=True)
     
@@ -450,23 +461,17 @@ if game_state["is_active"]:
         
         if remaining <= 0:
             game_state["is_exploded"] = True
-            game_state["last_update"] = time.time()
+            game_state["last_update"] = time.time() # 폭발 시 전역 동기화
+            st.session_state["last_seen_update"] = game_state["last_update"]
             st.rerun()
         else:
-            # 0.1초 단위로 전역 변경 감지 및 자동 화면 갱신
-            if st.session_state["last_seen_update"] != game_state["last_update"]:
-                st.session_state["last_seen_update"] = game_state["last_update"]
-                st.rerun()
             time.sleep(0.1)
             st.rerun()
             
     if game_state["is_exploded"]:
         name_placeholder.markdown(f"<div class='exploded-card'>💥 {game_state['current_student']} 님 탈락! 💥</div>", unsafe_allow_html=True)
 
-# 대기 상태 시 0.5초 간격으로 전역 변경 사항 실시간 하트비트 감지
-if not game_state["is_active"]:
-    if st.session_state["last_seen_update"] != game_state["last_update"]:
-        st.session_state["last_seen_update"] = game_state["last_update"]
-        st.rerun()
-    time.sleep(0.5)
+# 게임 대기 및 폭발 상태일 때 0.3초 감지 루프 실행
+if not game_state["is_active"] or game_state["is_exploded"]:
+    time.sleep(0.3)
     st.rerun()
