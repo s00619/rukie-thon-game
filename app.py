@@ -2,7 +2,7 @@ import random
 import time
 import streamlit as st
 
-# 페이지 설정
+# 페이지 기본 설정
 st.set_page_config(
     page_title="2026 YUnicorn 루키톤 - 스피드 서바이벌",
     page_icon="💥",
@@ -29,10 +29,52 @@ def get_shared_game_state():
 game_state = get_shared_game_state()
 
 # ----------------------------------------------------
-# [150개+ TMI & 자기소개 중심 데이터베이스]
+# [190개+ TMI & 취·창업 태도 중심 데이터베이스]
 # ----------------------------------------------------
 KEYWORDS_DB = [
-    # 1. 개인 프로필 & 기본 TMI
+    # 1. 취업 & 창업 태도 및 기업가정신
+    "취업/창업할 때 나에게 가장 중요한 요소 1가지(연봉, 워라밸, 성장, 분위기)?",
+    "실패나 시련이 찾아왔을 때 나만의 회복 탄력성(극복) 노하우는?",
+    "새로운 일에 도전할 때 나는 완벽주의파 VS 일단 실행파?",
+    "내가 생각하는 '좋은 리더'의 가장 중요한 덕목 한 가지!",
+    "내가 생각하는 '함께 일하고 싶은 동료'의 조건 한 가지!",
+    "약속 시간이나 피칭 데드라인을 지키기 위한 나만의 시간관리 팁!",
+    "팀원과 의견 충돌이 생겼을 때 내가 주로 선택하는 해결 방식은?",
+    "누군가 내 아이디어를 비판했을 때 나의 솔직한 태도와 대처법은?",
+    "내가 가장 중요하게 생각하는 일터에서의 피드백(지적) 수용 태도는?",
+    "일할 때 스트레스나 피로가 쌓이면 어떻게 에너지 관리를 하나요?",
+    "스스로 '성장했다'고 느끼는 순간은 언제인가요?",
+    "내가 잘 아는 분야 VS 잘 모르지만 비전 있는 분야, 도전하고 싶은 창업은?",
+    "리스크(위험)를 감수하더라도 도전해보고 싶은 내 삶의 영역은?",
+    "창업가/직장인으로서 나를 한 단어로 표현한다면 어떤 단어인가요?",
+    "내가 생각하는 '실패'란 어떤 의미인가요?",
+    "새로운 기술(AI 등)이나 도구가 나왔을 때 나만의 공부/적응 태도는?",
+    "팀원들에게 내 업무 진행 상황을 공유하는 나만의 소통 스타일은?",
+    "중요한 계약이나 발표(피칭) 직전 긴장감을 푸는 나만의 꿀팁!",
+    "취업/창업 시장에서 나의 확실한 경쟁력(차별화 포인트) 한 가지!",
+    "내가 생각하는 '프로 정신(전문성)'이란 무엇인가요?",
+    "어려운 과제가 주어졌을 때 끝까지 포기하지 않게 만드는 원동력은?",
+    "내가 정직함과 윤리의식을 지키기 위해 노력하는 부분은?",
+    "일(프로젝트)을 할 때 나의 집중력이 가장 높아지는 환경은?",
+    "내가 원하는 나의 10년 뒤 커리어/직업적 모습 한 가지!",
+    "팀의 성과를 위해 내가 기꺼이 양보할 수 있는 부분은?",
+    "내가 생각하는 최고의 '동기부여' 요소는 무엇인가요?",
+    "문제가 생겼을 때 원인을 찾는 편인가요, 즉시 해결책을 찾는 편인가요?",
+    "남들이 안 된다고 할 때 내 아이디어를 설득하는 나만의 무기는?",
+    "취업/창업 준비 과정에서 가장 신나고 즐거운 순간은?",
+    "내가 생각하는 긍정적인 사고방식의 힘이란?",
+    "내가 맡은 역할에 책임감을 느끼게 되는 순간은?",
+    "나보다 뛰어난 팀원을 만났을 때 나의 솔직한 심정과 태도는?",
+    "변화나 예기치 못한 상황이 생겼을 때 유연하게 대처하는 편인가요?",
+    "내가 생각하는 '워라밸'의 기준은 무엇인가요?",
+    "취업/창업을 준비하는 주변 친구들에게 전하고 싶은 조언 한마디!",
+    "내가 팀원들에게 가장 자주 듣는 일할 때의 칭찬은?",
+    "창업가로서 꼭 갖춰야 할 시야나 경험 한 가지는?",
+    "목표를 달성했을 때 나 자신에게 주는 보상은 무엇인가요?",
+    "창업 현장에서 대인관계(네트워킹)를 맺을 때 나의 태도는?",
+    "오늘 루키톤 활동에 임하는 나만의 슬로건/자세 한마디!",
+
+    # 2. 개인 프로필 & 기본 TMI
     "나의 MBTI와 그 유형의 가장 큰 특징은?",
     "나의 혈액형과 평소 내 성격의 공통점은?",
     "내가 태어난 띠(생년)와 별자리는?",
@@ -74,7 +116,7 @@ KEYWORDS_DB = [
     "자신 있는 노래방 18번 곡 제목은?",
     "본인이 가장 좋아하는 스트리머/유튜버는?",
 
-    # 2. 취향 & 습관 & 일상 TMI
+    # 3. 취향 & 습관 & 일상 TMI
     "스트레스받을 때 풀어버리는 나만의 방법은?",
     "시험 끝난 날 가장 먼저 하는 일은?",
     "주말 아침에 눈떴을 때 주로 하는 행동은?",
@@ -116,7 +158,7 @@ KEYWORDS_DB = [
     "내가 살아오면서 가장 화났던 순간은?",
     "가장 좋아하는 아이스크림 맛은?",
 
-    # 3. 루키톤 & 창업 & 특성화고/대학생 TMI
+    # 4. 루키톤 & 아이디어 & 지역 TMI
     "이번 루키톤에 참여하게 된 솔직한 계기는?",
     "루키톤 팀원들에게 내세울 수 있는 나만의 필살기 역량!",
     "내가 밤새워 몰입할 수 있는 관심 분야는?",
@@ -153,7 +195,7 @@ KEYWORDS_DB = [
     "이번 루키톤을 통해 얻어가고 싶은 최종 목표는?",
     "미래의 나에게 전달하고 싶은 한마디 응원은?",
 
-    # 4. 취향 선택 밸런스 게임 문항
+    # 5. 취향 선택 밸런스 게임 문항
     "부먹 VS 찍먹, 나의 선택과 이유는?",
     "민트초코 호 VS 불호, 나의 입장은?",
     "파인애플 피자 호 VS 불호, 나의 입장은?",
@@ -191,24 +233,34 @@ KEYWORDS_DB = [
     "현실적인 생각 위주(S) VS 상상력 풍부한 생각 위주(N)?"
 ]
 
-# CSS 스타일링
+# 모바일 컴팩트 맞춤형 CSS 스타일링 (글자 크기 및 여백 재조정)
 st.markdown("""
     <style>
     .stApp { background-color: #121212; color: white; }
-    .main-title { text-align: center; font-size: 2.2rem; font-weight: bold; color: #FFD166; margin-bottom: 20px; }
+    .block-container { padding-top: 0.8rem !important; padding-bottom: 0.8rem !important; }
     
-    div[data-testid="stExpander"] { background-color: #1e1e1e !important; border: 2px solid #333 !important; border-radius: 18px !important; }
-    div[data-testid="stExpander"] summary { background-color: #2b2b36 !important; color: #FFD166 !important; font-weight: bold !important; font-size: 1.15rem !important; border-radius: 14px !important; }
+    .main-title { 
+        text-align: center; 
+        font-size: 1.35rem !important; 
+        font-weight: bold; 
+        color: #FFD166; 
+        margin-bottom: 8px !important; 
+    }
     
+    /* Expander 모바일 초밀착 최적화 */
+    div[data-testid="stExpander"] { background-color: #1e1e1e !important; border: 1px solid #333 !important; border-radius: 10px !important; }
+    div[data-testid="stExpander"] summary { background-color: #2b2b36 !important; color: #FFD166 !important; font-weight: bold !important; font-size: 0.88rem !important; padding: 6px 10px !important; }
+    
+    /* 버튼 스타일 모바일 아담하게 조정 */
     div.stButton > button {
         background: linear-gradient(135deg, #06D6A0, #118AB2) !important;
         color: #ffffff !important;
-        font-size: 1.1rem !important;
+        font-size: 0.95rem !important;
         font-weight: bold !important;
-        border-radius: 50px !important;
+        border-radius: 25px !important;
         border: none !important;
-        padding: 10px 24px !important;
-        box-shadow: 0 4px 10px rgba(6, 214, 160, 0.3) !important;
+        padding: 6px 14px !important;
+        box-shadow: 0 2px 6px rgba(6, 214, 160, 0.3) !important;
     }
     div.stButton > button[kind="secondary"] {
         background: linear-gradient(135deg, #FF70A6, #FF5964) !important;
@@ -218,58 +270,90 @@ st.markdown("""
     .start-btn button {
         background: linear-gradient(135deg, #FFD166, #FF9F1C) !important;
         color: #121212 !important;
-        font-size: 1.5rem !important;
+        font-size: 1.2rem !important;
         font-weight: 800 !important;
-        padding: 18px !important;
-        border-radius: 50px !important;
+        padding: 12px !important;
+        border-radius: 25px !important;
     }
     
     .pass-btn button {
         background: linear-gradient(135deg, #06D6A0, #04A777) !important;
         color: #ffffff !important;
-        font-size: 1.6rem !important;
+        font-size: 1.25rem !important;
         font-weight: 800 !important;
-        padding: 18px !important;
-        border-radius: 50px !important;
-        box-shadow: 0 6px 18px rgba(6, 214, 160, 0.5) !important;
+        padding: 12px !important;
+        border-radius: 25px !important;
+        box-shadow: 0 3px 12px rgba(6, 214, 160, 0.5) !important;
     }
     
     .wait-box {
         background-color: #1e1e1e;
         border: 2px dashed #FFD166;
-        border-radius: 18px;
-        padding: 15px;
+        border-radius: 12px;
+        padding: 10px;
         text-align: center;
-        font-size: 1.2rem;
+        font-size: 0.95rem;
         color: #FFD166;
         font-weight: bold;
     }
 
-    .keyword-card { background-color: #1e1e1e; border-radius: 18px; padding: 22px; text-align: center; font-size: 1.7rem; font-weight: bold; color: #FFD166; border: 2px solid #333; margin-bottom: 20px; line-height: 1.4; }
-    .name-card { background-color: #2b2b36; border-radius: 24px; padding: 30px; text-align: center; font-size: 3.5rem; font-weight: bold; color: #FFD166; margin: 20px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    .exploded-card { background-color: #381a1d; border-radius: 24px; padding: 30px; text-align: center; font-size: 3.5rem; font-weight: bold; color: #FF5964; border: 3px solid #FF5964; }
+    /* 컴팩트 텍스트 및 카드 스타일 */
+    .keyword-card { 
+        background-color: #1e1e1e; 
+        border-radius: 12px; 
+        padding: 12px 14px; 
+        text-align: center; 
+        font-size: 1.15rem !important; 
+        font-weight: bold; 
+        color: #FFD166; 
+        border: 2px solid #333; 
+        margin-bottom: 10px; 
+        line-height: 1.3; 
+    }
+    .name-card { 
+        background-color: #2b2b36; 
+        border-radius: 16px; 
+        padding: 14px; 
+        text-align: center; 
+        font-size: 2.2rem !important; 
+        font-weight: bold; 
+        color: #FFD166; 
+        margin: 8px 0; 
+        box-shadow: 0 3px 10px rgba(0,0,0,0.5); 
+    }
+    .exploded-card { 
+        background-color: #381a1d; 
+        border-radius: 16px; 
+        padding: 14px; 
+        text-align: center; 
+        font-size: 2.1rem !important; 
+        font-weight: bold; 
+        color: #FF5964; 
+        border: 2px solid #FF5964; 
+    }
     </style>
 """, unsafe_allow_html=True)
 
 st.markdown("<div class='main-title'>🚀 2026 YUnicorn 루키톤<br>스피드 TMI 서바이벌</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# [1] 기기 세션 로그인 & 명단 관리 (방장 제외 로직)
+# [1] 기기 세션 로그인 & 명단 관리 (항상 열림 설정)
 # ----------------------------------------------------
 if "my_name" not in st.session_state:
     st.session_state["my_name"] = ""
 
+# 학생들의 직관적인 등록을 위해 항상 열어둠(expanded=True)
 with st.expander("🙋‍♂️ 내 이름 등록 / 접속자 확인", expanded=True):
     col_host_check, _ = st.columns([3, 1])
-    is_host = col_host_check.checkbox("👑 방장(진행자)으로 접속하기 (지목 제외)", value=(st.session_state["my_name"] == "방장"))
+    is_host = col_host_check.checkbox("👑 방장(진행자) 접속", value=(st.session_state["my_name"] == "방장"))
     
     col1, col2 = st.columns([3, 1])
     with col1:
         if is_host:
             st.session_state["my_name"] = "방장"
-            st.info("👑 현재 '방장(진행자)' 권한입니다. 폭탄 지목 대상에서 제외됩니다.")
+            st.info("👑 방장 권한으로 접속 중")
         else:
-            input_name = st.text_input("이름 입력", value=("" if st.session_state["my_name"] == "방장" else st.session_state["my_name"]), placeholder="본인 이름을 입력하세요", label_visibility="collapsed")
+            input_name = st.text_input("이름 입력", value=("" if st.session_state["my_name"] == "방장" else st.session_state["my_name"]), placeholder="본인 이름", label_visibility="collapsed")
     
     with col2:
         if not is_host and st.button("✨ 등록", use_container_width=True):
@@ -281,23 +365,19 @@ with st.expander("🙋‍♂️ 내 이름 등록 / 접속자 확인", expanded=
                 st.rerun()
 
     if st.session_state["my_name"] and st.session_state["my_name"] != "방장":
-        st.success(f"📱 이 기기는 **[{st.session_state['my_name']}]** 님의 화면입니다.")
+        st.success(f"📱 내 이름: **[{st.session_state['my_name']}]**")
         
     if game_state["students"]:
-        st.write(f"**현재 생존 학생 참가자 ({len(game_state['students'])}명):**")
+        st.write(f"**현재 참가자 ({len(game_state['students'])}명):**")
         tags = " ".join([f"`👤 {name}`" for name in game_state["students"]])
         st.markdown(tags)
         
-        if (is_host or st.session_state["my_name"] == "방장") and st.button("🧹 전체 명단 초기화", type="secondary"):
+        if (is_host or st.session_state["my_name"] == "방장") and st.button("🧹 명단 초기화", type="secondary"):
             game_state["students"] = []
             game_state["is_active"] = False
             game_state["used_keywords"] = []
             game_state["last_update"] = time.time()
             st.rerun()
-    else:
-        st.info("학생들은 본인 이름을 등록해주세요!")
-
-st.divider()
 
 # 무작위 주제 추출
 def get_random_keyword():
@@ -311,7 +391,7 @@ def get_random_keyword():
     return selected
 
 # ----------------------------------------------------
-# [2] 게임 진행 및 자동 당사자/방장 버튼 컨트롤
+# [2] 게임 진행 및 모바일 맞춤형 버튼 제어
 # ----------------------------------------------------
 if not game_state["students"]:
     st.warning("⚠️ 학생 참가자를 1명 이상 등록해 주세요.")
@@ -319,7 +399,7 @@ else:
     # 1) 게임 시작 전/종료 상태
     if not game_state["is_active"] or game_state["is_exploded"]:
         st.markdown("<div class='start-btn'>", unsafe_allow_html=True)
-        if st.button("🚀 게임 시작 (폭탄 돌리기 시작!)", use_container_width=True):
+        if st.button("🚀 게임 시작 (폭탄 돌리기)", use_container_width=True):
             game_state["current_student"] = random.choice(game_state["students"])
             game_state["current_keyword"] = get_random_keyword()
             game_state["is_active"] = True
@@ -329,15 +409,14 @@ else:
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # 2) 게임 진행 중 상태 (학생 당사자 or 방장만 제어 가능)
+    # 2) 게임 진행 중 상태
     else:
         current_target = game_state["current_student"]
         my_name = st.session_state["my_name"]
 
-        # [당사자 또는 방장 화면]: 패스 버튼 노출
         if my_name == current_target or my_name == "방장" or is_host:
             st.markdown("<div class='pass-btn'>", unsafe_allow_html=True)
-            btn_label = "▶️ 외쳤다! 다음 사람에게 패스" if my_name == current_target else f"👑 [방장 권한] {current_target} 님 답변 완료 -> 패스"
+            btn_label = "▶️ 외쳤다! 다음 사람에게 패스" if my_name == current_target else f"👑 [방장] {current_target} 님 패스"
             if st.button(btn_label, use_container_width=True):
                 candidates = [s for s in game_state["students"] if s != current_target]
                 if not candidates:
@@ -350,12 +429,11 @@ else:
                 st.rerun()
             st.markdown("</div>", unsafe_allow_html=True)
             
-        # [타인 화면]: 대기 안내문 표시
         else:
-            st.markdown(f"<div class='wait-box'>⏳ 현재 [{current_target}] 님이 답변 중입니다. (대기 중...)</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='wait-box'>⏳ [{current_target}] 님이 답변 중...</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# [3] 화면 연출 및 타이머 처리
+# [3] 모바일 메인 화면 연출 및 타이머
 # ----------------------------------------------------
 if game_state["is_active"]:
     st.markdown(f"<div class='keyword-card'>📌 {game_state['current_keyword']}</div>", unsafe_allow_html=True)
