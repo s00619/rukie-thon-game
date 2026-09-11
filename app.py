@@ -6,24 +6,49 @@ import streamlit as st
 st.set_page_config(
     page_title="2026 YUnicorn 루키톤 - 스피드 키워드 서바이벌",
     page_icon="💥",
-    layout="centered",
+    layout="centered"
 )
 
-# 커스텀 CSS (귀여운 스타일링)
-st.markdown(
-    """
+# 커스텀 CSS (Expander 가독성 개선 및 귀여운 스타일링)
+st.markdown("""
     <style>
+    /* 전체 배경 */
     .stApp {
         background-color: #121212;
         color: white;
     }
+    
+    /* 메인 타이틀 */
     .main-title {
         text-align: center;
-        font-size: 2rem;
+        font-size: 2.2rem;
         font-weight: bold;
         color: #FFD166;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
+    
+    /* Expander(접이식 창) 가독성 개선 */
+    div[data-testid="stExpander"] {
+        background-color: #1e1e1e !important;
+        border: 2px solid #333 !important;
+        border-radius: 15px !important;
+    }
+    
+    div[data-testid="stExpander"] summary {
+        background-color: #2b2b36 !important;
+        color: #FFD166 !important; /* 명확한 노란색 글자 */
+        font-weight: bold !important;
+        font-size: 1.15rem !important;
+        border-radius: 12px !important;
+        padding: 12px 18px !important;
+    }
+    
+    div[data-testid="stExpander"] summary:hover {
+        background-color: #383848 !important; /* 마우스 올렸을 때 어두운 가독성 높은 배경 */
+        color: #FFFFFF !important;
+    }
+    
+    /* 카드 스타일 */
     .keyword-card {
         background-color: #1e1e1e;
         border-radius: 15px;
@@ -57,53 +82,38 @@ st.markdown(
         border: 3px solid #FF5964;
     }
     </style>
-""",
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
 
-# 세션 상태 초기화 (페이지가 새로고침되어도 데이터 유지)
+# 세션 상태 초기화
 if "students" not in st.session_state:
     st.session_state.students = []
 
 if "keywords" not in st.session_state:
     st.session_state.keywords = [
-        "문경 최고의 맛집",
-        "내가 제일 잘하는 기술",
-        "학교 매점 최애 메뉴",
-        "요즘 가장 즐겨하는 게임",
-        "나만의 스트레스 해소법",
-        "가지고 싶은 신기술 제품",
-        "이번 루키톤에서 내 역할",
-        "멘토님께 궁금한 점",
-        "주말에 주로 하는 것",
+        "문경 최고의 맛집", "내가 제일 잘하는 기술", "학교 매점 최애 메뉴",
+        "요즘 가장 즐겨하는 게임", "나만의 스트레스 해소법", "가지고 싶은 신기술 제품",
+        "이번 루키톤에서 내 역할", "멘토님께 궁금한 점", "주말에 주로 하는 것"
     ]
 
-st.markdown(
-    "<div class='main-title'>🚀 2026 YUnicorn 루키톤<br>스피드 키워드 서바이벌</div>",
-    unsafe_allow_html=True,
-)
+st.markdown("<div class='main-title'>🚀 2026 YUnicorn 루키톤<br>스피드 키워드 서바이벌</div>", unsafe_allow_html=True)
 
 # --- [1] 학생 이름 입력 및 관리 영역 ---
-with st.expander("🙋‍♂️ 참가자 이름 입력 / 관리하기", expanded=True):
+with st.expander("🙋‍♂️ 참가자 이름 입력 / 관리하기 (클릭하여 열기/접기)", expanded=True):
     col1, col2 = st.columns([3, 1])
     with col1:
-        new_name = st.text_input(
-            "이름을 입력하세요",
-            placeholder="예: 홍길동",
-            label_visibility="collapsed",
-        )
+        new_name = st.text_input("이름을 입력하세요", placeholder="예: 홍길동", label_visibility="collapsed")
     with col2:
         if st.button("✨ 추가", use_container_width=True):
             if new_name and new_name not in st.session_state.students:
                 st.session_state.students.append(new_name)
                 st.rerun()
-
+    
     # 등록된 명단 표시
     if st.session_state.students:
         st.write("**현재 참가자 목록:**")
         tags = " ".join([f"`👤 {name}`" for name in st.session_state.students])
         st.markdown(tags)
-
+        
         if st.button("🧹 전체 명단 삭제", type="secondary"):
             st.session_state.students = []
             st.rerun()
@@ -119,36 +129,27 @@ else:
     if st.button("🔥 폭탄 돌리기 (START / NEXT)", use_container_width=True):
         selected_student = random.choice(st.session_state.students)
         selected_keyword = random.choice(st.session_state.keywords)
-
+        
         # 주제 및 지목된 학생 출력
-        st.markdown(
-            f"<div class='keyword-card'>📌 주제: {selected_keyword}</div>",
-            unsafe_allow_html=True,
-        )
+        st.markdown(f"<div class='keyword-card'>📌 주제: {selected_keyword}</div>", unsafe_allow_html=True)
         name_placeholder = st.empty()
-        name_placeholder.markdown(
-            f"<div class='name-card'>👤 {selected_student}</div>",
-            unsafe_allow_html=True,
-        )
-
+        name_placeholder.markdown(f"<div class='name-card'>👤 {selected_student}</div>", unsafe_allow_html=True)
+        
         # 타이머 애니메이션 (5초 카운트다운)
         progress_bar = st.progress(100)
         time_limit = 5.0
         start_time = time.time()
-
+        
         while True:
             elapsed = time.time() - start_time
             remaining = max(0.0, time_limit - elapsed)
             ratio = remaining / time_limit
-
+            
             progress_bar.progress(int(ratio * 100))
-
+            
             if remaining <= 0:
                 break
             time.sleep(0.05)
-
+            
         # 시간 초과 시 폭발 연출
-        name_placeholder.markdown(
-            f"<div class='exploded-card'>💥 {selected_student} 당첨! 💥</div>",
-            unsafe_allow_html=True,
-        )
+        name_placeholder.markdown(f"<div class='exploded-card'>💥 {selected_student} 당첨! 💥</div>", unsafe_allow_html=True)
