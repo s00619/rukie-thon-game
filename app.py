@@ -20,7 +20,9 @@ def get_shared_game_state():
         "current_keyword": "",
         "is_active": False,
         "is_exploded": False,
-        "last_update": time.time()  # 상태 변경 감지용 타임스탬프
+        "start_time": 0,
+        "time_limit": 5.0,
+        "last_update": time.time()
     }
 
 game_state = get_shared_game_state()
@@ -41,16 +43,27 @@ st.markdown("""
     div[data-testid="stExpander"] { background-color: #1e1e1e !important; border: 2px solid #333 !important; border-radius: 15px !important; }
     div[data-testid="stExpander"] summary { background-color: #2b2b36 !important; color: #FFD166 !important; font-weight: bold !important; font-size: 1.15rem !important; }
     
-    /* 큰 시작 버튼 전용 스타일 */
+    /* 버튼 스타일 */
     .start-btn button {
         background-color: #06D6A0 !important;
         color: #121212 !important;
-        font-size: 1.5rem !important;
+        font-size: 1.4rem !important;
+        font-weight: bold !important;
+        padding: 16px !important;
+        border-radius: 15px !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(6, 214, 160, 0.4) !important;
+    }
+    
+    .pass-btn button {
+        background-color: #FFD166 !important;
+        color: #121212 !important;
+        font-size: 1.6rem !important;
         font-weight: bold !important;
         padding: 18px !important;
         border-radius: 15px !important;
         border: none !important;
-        box-shadow: 0 4px 15px rgba(6, 214, 160, 0.4) !important;
+        box-shadow: 0 4px 15px rgba(255, 209, 102, 0.4) !important;
     }
     
     /* 카드 스타일 */
@@ -92,23 +105,42 @@ with st.expander("🙋‍♂️ 참가자 이름 입력 / 명단 확인", expand
 st.divider()
 
 # ----------------------------------------------------
-# [2] 메인 게임 시작 및 진행 버튼 (방장/진행자용)
+# [2] 게임 진행 컨트롤
 # ----------------------------------------------------
-st.markdown("<div class='start-btn'>", unsafe_allow_html=True)
 if not game_state["students"]:
-    st.warning("⚠️ 참가자를 1명 이상 등록하면 시작 버튼이 활성화됩니다.")
+    st.warning("⚠️ 참가자를 1명 이상 등록해 주세요.")
 else:
-    if st.button("🔥 게임 시작 / 다음 폭탄 전달 (START / NEXT)", use_container_width=True):
-        game_state["current_student"] = random.choice(game_state["students"])
-        game_state["current_keyword"] = random.choice(KEYWORDS)
-        game_state["is_active"] = True
-        game_state["is_exploded"] = False
-        game_state["last_update"] = time.time()  # 상태 업데이트
-        st.rerun()
-st.markdown("</div>", unsafe_allow_html=True)
+    # 게임 미진행 상태일 때 -> 시작 버튼
+    if not game_state["is_active"] or game_state["is_exploded"]:
+        st.markdown("<div class='start-btn'>", unsafe_allow_html=True)
+        if st.button("🚀 게임 시작 (폭탄 돌리기 시작!)", use_container_width=True):
+            game_state["current_student"] = random.choice(game_state["students"])
+            game_state["current_keyword"] = random.choice(KEYWORDS)
+            game_state["is_active"] = True
+            game_state["is_exploded"] = False
+            game_state["start_time"] = time.time()
+            game_state["last_update"] = time.time()
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    # 게임 진행 중일 때 -> 다음 사람 패스 버튼
+    else:
+        st.markdown("<div class='pass-btn'>", unsafe_allow_html=True)
+        if st.button("▶️ 외쳤다! 다음 사람에게 패스 (리셋)", use_container_width=True):
+            # 이전 학생 제외 무작위 추첨 (2명 이상일 때)
+            candidates = [s for s in game_state["students"] if s != game_state["current_student"]]
+            if not candidates:
+                candidates = game_state["students"]
+                
+            game_state["current_student"] = random.choice(candidates)
+            game_state["current_keyword"] = random.choice(KEYWORDS)
+            game_state["start_time"] = time.time() # 5초 타이머 리셋
+            game_state["last_update"] = time.time()
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# [3] 게임 플레이 연출 및 실시간 자동 동기화
+# [3] 화면 연출 및 타이머 처리
 # ----------------------------------------------------
 if game_state["is_active"]:
     st.markdown(f"<div class='keyword-card'>📌 주제: {game_state['current_keyword']}</div>", unsafe_allow_html=True)
@@ -116,32 +148,26 @@ if game_state["is_active"]:
     name_placeholder = st.empty()
     name_placeholder.markdown(f"<div class='name-card'>👤 {game_state['current_student']}</div>", unsafe_allow_html=True)
     
-    # 타이머 연출
     if not game_state["is_exploded"]:
-        progress_bar = st.progress(100)
-        start_time = time.time()
-        time_limit = 5.0
+        # 타이머 동적 계산
+        elapsed = time.time() - game_state["start_time"]
+        remaining = max(0.0, game_state["time_limit"] - elapsed)
+        ratio = remaining / game_state["time_limit"]
         
-        while True:
-            elapsed = time.time() - start_time
-            remaining = max(0.0, time_limit - elapsed)
-            ratio = remaining / time_limit
-            
-            progress_bar.progress(int(ratio * 100))
-            
-            if remaining <= 0:
-                game_state["is_exploded"] = True
-                game_state["last_update"] = time.time()
-                st.rerun()
-                break
-            time.sleep(0.05)
+        st.progress(int(ratio * 100))
+        
+        if remaining <= 0:
+            game_state["is_exploded"] = True
+            game_state["last_update"] = time.time()
+            st.rerun()
+        else:
+            time.sleep(0.1)
+            st.rerun()
             
     if game_state["is_exploded"]:
         name_placeholder.markdown(f"<div class='exploded-card'>💥 {game_state['current_student']} 당첨! 💥</div>", unsafe_allow_html=True)
 
-# ----------------------------------------------------
-# [4] 대기 상태일 때 자동 감지 리프레시 (2초 폴링)
-# ----------------------------------------------------
+# 대기 상태 시 2초 자동 폴링
 if not game_state["is_active"]:
     time.sleep(2)
     st.rerun()
