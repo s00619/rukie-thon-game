@@ -6,7 +6,7 @@ import streamlit as st
 st.set_page_config(
     page_title="2026 YUnicorn 루키톤 - 스피드 TMI 서바이벌",
     page_icon="💥",
-    layout="centered"
+    layout="centered",
 )
 
 # ----------------------------------------------------
@@ -21,10 +21,11 @@ def get_shared_game_state():
         "is_active": False,
         "is_exploded": False,
         "start_time": 0,
-        "time_limit": 7.0, # 제한시간 5초 -> 7초로 2초 연장!
+        "time_limit": 7.0,  # 7초 제한시간
         "last_update": time.time(),
-        "used_keywords": []
+        "used_keywords": [],
     }
+
 
 game_state = get_shared_game_state()
 
@@ -32,7 +33,7 @@ game_state = get_shared_game_state()
 # [150개+ TMI & 자기소개 중심 데이터베이스]
 # ----------------------------------------------------
 KEYWORDS_DB = [
-    # 1. 개인 프로필 & 기본 TMI (40개)
+    # 1. 개인 프로필 & 기본 TMI
     "나의 MBTI와 그 유형의 가장 큰 특징은?",
     "나의 혈액형과 평소 내 성격의 공통점은?",
     "내가 태어난 띠(생년)와 별자리는?",
@@ -73,8 +74,7 @@ KEYWORDS_DB = [
     "본인의 가장 오래된 절친/친구 이름은?",
     "자신 있는 노래방 18번 곡 제목은?",
     "본인이 가장 좋아하는 스트리머/유튜버는?",
-
-    # 2. 취향 & 습관 & 일상 TMI (40개)
+    # 2. 취향 & 습관 & 일상 TMI
     "스트레스받을 때 풀어버리는 나만의 방법은?",
     "시험 끝난 날 가장 먼저 하는 일은?",
     "주말 아침에 눈떴을 때 주로 하는 행동은?",
@@ -115,8 +115,7 @@ KEYWORDS_DB = [
     "월요일 아침마다 머릿속에 드는 솔직한 생각은?",
     "내가 살아오면서 가장 화났던 순간은?",
     "가장 좋아하는 아이스크림 맛은?",
-
-    # 3. 루키톤 & 창업 & 특성화고/대학생 TMI (35개)
+    # 3. 루키톤 & 창업 & 특성화고/대학생 TMI
     "이번 루키톤에 참여하게 된 솔직한 계기는?",
     "루키톤 팀원들에게 내세울 수 있는 나만의 필살기 역량!",
     "내가 밤새워 몰입할 수 있는 관심 분야는?",
@@ -152,8 +151,7 @@ KEYWORDS_DB = [
     "나만의 창의력을 끌어올리는 비밀 시간/장소는?",
     "이번 루키톤을 통해 얻어가고 싶은 최종 목표는?",
     "미래의 나에게 전달하고 싶은 한마디 응원은?",
-
-    # 4. 취향 선택 밸런스 게임 문항 (35개)
+    # 4. 취향 선택 밸런스 게임 문항
     "부먹 VS 찍먹, 나의 선택과 이유는?",
     "민트초코 호 VS 불호, 나의 입장은?",
     "파인애플 피자 호 VS 불호, 나의 입장은?",
@@ -188,11 +186,12 @@ KEYWORDS_DB = [
     "노트북으로 작업하기 VS 태블릿/스마트폰으로 작업하기?",
     "집순이/집돌이 VS 무조건 나가 놀기?",
     "계획대로 움직이기(J) VS 즉흥적으로 움직이기(P)?",
-    "현실적인 생각 위주(S) VS 상상력 풍부한 생각 위주(N)?"
+    "현실적인 생각 위주(S) VS 상상력 풍부한 생각 위주(N)?",
 ]
 
-# CSS 스타일링 (버튼 가독성 완전 고정 & 귀여운 파스텔 스타일)
-st.markdown("""
+# CSS 스타일링
+st.markdown(
+    """
     <style>
     /* 전체 배경 */
     .stApp { background-color: #121212; color: white; }
@@ -214,10 +213,7 @@ st.markdown("""
         box-shadow: 0 4px 10px rgba(6, 214, 160, 0.3) !important;
         transition: transform 0.1s ease !important;
     }
-    div.stButton > button:hover {
-        transform: scale(1.03) !important;
-        color: #ffffff !important;
-    }
+    div.stButton > button:hover { transform: scale(1.03) !important; color: #ffffff !important; }
     
     /* [보조 버튼] - 전체 명단 초기화 */
     div.stButton > button[kind="secondary"] {
@@ -255,9 +251,14 @@ st.markdown("""
     .name-card { background-color: #2b2b36; border-radius: 24px; padding: 30px; text-align: center; font-size: 3.5rem; font-weight: bold; color: #FFD166; margin: 20px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     .exploded-card { background-color: #381a1d; border-radius: 24px; padding: 30px; text-align: center; font-size: 3.5rem; font-weight: bold; color: #FF5964; border: 3px solid #FF5964; }
     </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
-st.markdown("<div class='main-title'>🚀 2026 YUnicorn 루키톤<br>스피드 TMI 서바이벌</div>", unsafe_allow_html=True)
+st.markdown(
+    "<div class='main-title'>🚀 2026 YUnicorn 루키톤<br>스피드 TMI 서바이벌</div>",
+    unsafe_allow_html=True,
+)
 
 # ----------------------------------------------------
 # [1] 참가자 이름 입력 및 관리 영역
@@ -265,19 +266,26 @@ st.markdown("<div class='main-title'>🚀 2026 YUnicorn 루키톤<br>스피드 T
 with st.expander("🙋‍♂️ 참가자 이름 입력 / 명단 확인", expanded=True):
     col1, col2 = st.columns([3, 1])
     with col1:
-        new_name = st.text_input("이름 입력", placeholder="본인 이름을 입력하세요", label_visibility="collapsed")
+        new_name = st.text_input(
+            "이름 입력",
+            placeholder="본인 이름을 입력하세요",
+            label_visibility="collapsed",
+        )
     with col2:
         if st.button("✨ 등록", use_container_width=True):
             if new_name and new_name not in game_state["students"]:
                 game_state["students"].append(new_name)
+                st.session_state["my_name"] = new_name  # 내 이름 저장
                 game_state["last_update"] = time.time()
                 st.rerun()
-    
+
     if game_state["students"]:
-        st.write(f"**현재 생존 참가자 ({len(game_state['students'])}명):**")
+        st.write(
+            f"**현재 생존 참가자 ({len(game_state['students'])}명):**"
+        )
         tags = " ".join([f"`👤 {name}`" for name in game_state["students"]])
         st.markdown(tags)
-        
+
         if st.button("🧹 전체 명단 초기화", type="secondary"):
             game_state["students"] = []
             game_state["is_active"] = False
@@ -289,28 +297,36 @@ with st.expander("🙋‍♂️ 참가자 이름 입력 / 명단 확인", expand
 
 st.divider()
 
+
 # 중복 없는 무작위 주제 추출 함수
 def get_random_keyword():
-    available = [k for k in KEYWORDS_DB if k not in game_state["used_keywords"]]
+    available = [
+        k for k in KEYWORDS_DB if k not in game_state["used_keywords"]
+    ]
     if not available:
         game_state["used_keywords"] = []
         available = KEYWORDS_DB
-    
+
     selected = random.choice(available)
     game_state["used_keywords"].append(selected)
     return selected
 
+
 # ----------------------------------------------------
-# [2] 게임 진행 컨트롤
+# [2] 게임 진행 컨트롤 및 지목된 자 전용 검증
 # ----------------------------------------------------
 if not game_state["students"]:
     st.warning("⚠️ 참가자를 1명 이상 등록해 주세요.")
 else:
-    # 게임 미진행 상태일 때 -> 시작 버튼
+    # 게임 시작 전 상태
     if not game_state["is_active"] or game_state["is_exploded"]:
         st.markdown("<div class='start-btn'>", unsafe_allow_html=True)
-        if st.button("🚀 게임 시작 (폭탄 돌리기 시작!)", use_container_width=True):
-            game_state["current_student"] = random.choice(game_state["students"])
+        if st.button(
+            "🚀 게임 시작 (폭탄 돌리기 시작!)", use_container_width=True
+        ):
+            game_state["current_student"] = random.choice(
+                game_state["students"]
+            )
             game_state["current_keyword"] = get_random_keyword()
             game_state["is_active"] = True
             game_state["is_exploded"] = False
@@ -319,37 +335,61 @@ else:
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # 게임 진행 중일 때 -> 다음 사람 패스 버튼
+    # 게임 진행 중 상태 (지목된 사람 확인 로직)
     else:
         st.markdown("<div class='pass-btn'>", unsafe_allow_html=True)
-        if st.button("▶️ 외쳤다! 다음 사람에게 패스", use_container_width=True):
-            candidates = [s for s in game_state["students"] if s != game_state["current_student"]]
-            if not candidates:
-                candidates = game_state["students"]
-                
-            game_state["current_student"] = random.choice(candidates)
-            game_state["current_keyword"] = get_random_keyword()
-            game_state["start_time"] = time.time() # 7초 타이머 리셋
-            game_state["last_update"] = time.time()
-            st.rerun()
+
+        # 본인 인증 체크박스 (지목된 사람 이름을 확인)
+        is_me = st.checkbox(
+            f"🔑 내가 지목된 [{game_state['current_student']}] 본인이 맞습니다",
+            value=False,
+        )
+
+        if st.button(
+            "▶️ 외쳤다! 다음 사람에게 패스", use_container_width=True
+        ):
+            if not is_me:
+                st.error(
+                    f"⛔ 지목된 [{game_state['current_student']}] 님 본인만 체크 후 패스 버튼을 누를 수 있습니다!"
+                )
+            else:
+                candidates = [
+                    s
+                    for s in game_state["students"]
+                    if s != game_state["current_student"]
+                ]
+                if not candidates:
+                    candidates = game_state["students"]
+
+                game_state["current_student"] = random.choice(candidates)
+                game_state["current_keyword"] = get_random_keyword()
+                game_state["start_time"] = time.time()  # 7초 리셋
+                game_state["last_update"] = time.time()
+                st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# [3] 화면 연출 및 타이머 처리 (7초 제한시간)
+# [3] 화면 연출 및 타이머 처리
 # ----------------------------------------------------
 if game_state["is_active"]:
-    st.markdown(f"<div class='keyword-card'>📌 {game_state['current_keyword']}</div>", unsafe_allow_html=True)
-    
+    st.markdown(
+        f"<div class='keyword-card'>📌 {game_state['current_keyword']}</div>",
+        unsafe_allow_html=True,
+    )
+
     name_placeholder = st.empty()
-    name_placeholder.markdown(f"<div class='name-card'>👤 {game_state['current_student']}</div>", unsafe_allow_html=True)
-    
+    name_placeholder.markdown(
+        f"<div class='name-card'>👤 {game_state['current_student']}</div>",
+        unsafe_allow_html=True,
+    )
+
     if not game_state["is_exploded"]:
         elapsed = time.time() - game_state["start_time"]
         remaining = max(0.0, game_state["time_limit"] - elapsed)
         ratio = remaining / game_state["time_limit"]
-        
+
         st.progress(int(ratio * 100))
-        
+
         if remaining <= 0:
             game_state["is_exploded"] = True
             game_state["last_update"] = time.time()
@@ -357,9 +397,12 @@ if game_state["is_active"]:
         else:
             time.sleep(0.1)
             st.rerun()
-            
+
     if game_state["is_exploded"]:
-        name_placeholder.markdown(f"<div class='exploded-card'>💥 {game_state['current_student']} 님 탈락! 💥</div>", unsafe_allow_html=True)
+        name_placeholder.markdown(
+            f"<div class='exploded-card'>💥 {game_state['current_student']} 님 탈락! 💥</div>",
+            unsafe_allow_html=True,
+        )
 
 # 대기 상태 시 2초 자동 폴링
 if not game_state["is_active"]:
