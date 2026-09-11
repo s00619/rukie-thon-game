@@ -4,13 +4,13 @@ import streamlit as st
 
 # 페이지 기본 설정
 st.set_page_config(
-    page_title="2026 YUnicorn 루키톤 - 스피드 서바이벌",
+    page_title="2026 YUnicorn 루키톤 - 스피드 TMI 서바이벌",
     page_icon="💥",
     layout="centered"
 )
 
 # ----------------------------------------------------
-# [실시간 공유 데이터베이스]
+# [실시간 멀티플레이어 데이터베이스 - 전역 서버 상태 공유]
 # ----------------------------------------------------
 @st.cache_resource
 def get_shared_game_state():
@@ -22,7 +22,7 @@ def get_shared_game_state():
         "is_exploded": False,
         "start_time": 0,
         "time_limit": 7.0, # 7초 제한시간
-        "last_update": time.time(),
+        "last_update": time.time(), # 글로벌 타임스탬프
         "used_keywords": []
     }
 
@@ -233,7 +233,7 @@ KEYWORDS_DB = [
     "현실적인 생각 위주(S) VS 상상력 풍부한 생각 위주(N)?"
 ]
 
-# 모바일 컴팩트 맞춤형 CSS 스타일링 (글자 크기 및 여백 재조정)
+# CSS 모바일 밀착 스타일링
 st.markdown("""
     <style>
     .stApp { background-color: #121212; color: white; }
@@ -247,11 +247,9 @@ st.markdown("""
         margin-bottom: 8px !important; 
     }
     
-    /* Expander 모바일 초밀착 최적화 */
     div[data-testid="stExpander"] { background-color: #1e1e1e !important; border: 1px solid #333 !important; border-radius: 10px !important; }
     div[data-testid="stExpander"] summary { background-color: #2b2b36 !important; color: #FFD166 !important; font-weight: bold !important; font-size: 0.88rem !important; padding: 6px 10px !important; }
     
-    /* 버튼 스타일 모바일 아담하게 조정 */
     div.stButton > button {
         background: linear-gradient(135deg, #06D6A0, #118AB2) !important;
         color: #ffffff !important;
@@ -297,7 +295,6 @@ st.markdown("""
         font-weight: bold;
     }
 
-    /* 컴팩트 텍스트 및 카드 스타일 */
     .keyword-card { 
         background-color: #1e1e1e; 
         border-radius: 12px; 
@@ -336,13 +333,16 @@ st.markdown("""
 
 st.markdown("<div class='main-title'>🚀 2026 YUnicorn 루키톤<br>스피드 TMI 서바이벌</div>", unsafe_allow_html=True)
 
+# 세션별 로컬 타임스탬프 추적 변수
+if "last_seen_update" not in st.session_state:
+    st.session_state["last_seen_update"] = 0
+
 # ----------------------------------------------------
-# [1] 기기 세션 로그인 & 명단 관리 (항상 열림 설정)
+# [1] 기기 세션 로그인 & 명단 관리
 # ----------------------------------------------------
 if "my_name" not in st.session_state:
     st.session_state["my_name"] = ""
 
-# 학생들의 직관적인 등록을 위해 항상 열어둠(expanded=True)
 with st.expander("🙋‍♂️ 내 이름 등록 / 접속자 확인", expanded=True):
     col_host_check, _ = st.columns([3, 1])
     is_host = col_host_check.checkbox("👑 방장(진행자) 접속", value=(st.session_state["my_name"] == "방장"))
@@ -391,7 +391,7 @@ def get_random_keyword():
     return selected
 
 # ----------------------------------------------------
-# [2] 게임 진행 및 모바일 맞춤형 버튼 제어
+# [2] 게임 진행 및 버튼 제어
 # ----------------------------------------------------
 if not game_state["students"]:
     st.warning("⚠️ 학생 참가자를 1명 이상 등록해 주세요.")
@@ -433,7 +433,7 @@ else:
             st.markdown(f"<div class='wait-box'>⏳ [{current_target}] 님이 답변 중...</div>", unsafe_allow_html=True)
 
 # ----------------------------------------------------
-# [3] 모바일 메인 화면 연출 및 타이머
+# [3] 메인 연출, 타이머 및 초고속 실시간 일괄 동기화
 # ----------------------------------------------------
 if game_state["is_active"]:
     st.markdown(f"<div class='keyword-card'>📌 {game_state['current_keyword']}</div>", unsafe_allow_html=True)
@@ -453,13 +453,20 @@ if game_state["is_active"]:
             game_state["last_update"] = time.time()
             st.rerun()
         else:
+            # 0.1초 단위로 전역 변경 감지 및 자동 화면 갱신
+            if st.session_state["last_seen_update"] != game_state["last_update"]:
+                st.session_state["last_seen_update"] = game_state["last_update"]
+                st.rerun()
             time.sleep(0.1)
             st.rerun()
             
     if game_state["is_exploded"]:
         name_placeholder.markdown(f"<div class='exploded-card'>💥 {game_state['current_student']} 님 탈락! 💥</div>", unsafe_allow_html=True)
 
-# 대기 상태 시 2초 자동 폴링
+# 대기 상태 시 0.5초 간격으로 전역 변경 사항 실시간 하트비트 감지
 if not game_state["is_active"]:
-    time.sleep(2)
+    if st.session_state["last_seen_update"] != game_state["last_update"]:
+        st.session_state["last_seen_update"] = game_state["last_update"]
+        st.rerun()
+    time.sleep(0.5)
     st.rerun()
